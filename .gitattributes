@@ -1,1 +1,1 @@
-*.html filter=lfs diff=lfs merge=lfs -text
+EaglercraftX_1.8_WASM-GC_Offline_Download.html filter=lfs diff=lfs merge=lfs -text
