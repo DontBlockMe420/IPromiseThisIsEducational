@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html style="width:100%;height:100%;background-color:black;">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+<meta name="description" content="Play minecraft 1.8 in your browser" />
+<meta name="keywords" content="eaglercraft, eaglercraftx, minecraft, 1.8, 1.8.8" />
+<title>student-engagement.org</title>
+
+<link rel="icon" href="hughs-favicon-5.png" type="image/png" />
+
+<script src="bootstrap.js"></script>
+
+<script>
+"use strict";
+window.addEventListener("load", function() {
+
+if(window.location.href.indexOf("file:") === 0){
+alert("HTTP please, run a local HTTP server");
+return;
+}
+
+window.eaglercraftXOpts = {
+demoMode: false,
+container: "game_frame",
+assetsURI: "assets.epw",
+worldsDB: "worlds",
+servers: [],
+relays: [
+{ addr: "wss://relay.deev.is/", comment: "Hughs-relay", primary: true }
+]
+};
+
+var q = window.location.search;
+if(q && q[0] === "?" && window.URLSearchParams){
+var params = new URLSearchParams(q);
+var s = params.get("server");
+if(s) window.eaglercraftXOpts.joinServer = s;
+}
+
+main();
+});
+</script>
+
+</head>
+
+<body style="margin:0;width:100%;height:100%;overflow:hidden;background:black;" id="game_frame"></body>
+</html>
