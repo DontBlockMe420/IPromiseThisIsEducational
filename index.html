@@ -2,36 +2,53 @@
 <html style="width:100%;height:100%;background-color:black;">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="description" content="Play minecraft 1.8 in your browser" />
 <meta name="keywords" content="eaglercraft, eaglercraftx, minecraft, 1.8, 1.8.8" />
 <title>student-engagement.org</title>
 
 <link rel="icon" href="hughs-favicon-5.png" type="image/png" />
 
-<!-- ✅ Clarity Tracking -->
+<!-- ✅ Clarity -->
 <script type="text/javascript">
-(function(c,l,a,r,i,t,y){
-    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-})(window, document, "clarity", "script", "YOUR_CLARITY_ID");
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "vwifc3enhq");
 </script>
 
-<!-- ✅ Tracking Functions -->
+<!-- ✅ TRACKING SYSTEM -->
 <script>
-function trackPlayClick() {
+let sessionStart = Date.now();
+let hasStartedGame = false;
+
+function safeClarity(type, name, value) {
   if (window.clarity) {
-    window.clarity("event", "play_clicked");
-    window.clarity("set", "game_version", "1.8.8");
+    if(type === "event") window.clarity("event", name);
+    if(type === "set") window.clarity("set", name, value);
   }
 }
 
-function trackGameStart() {
-  if (window.clarity) {
-    window.clarity("event", "game_started");
+// basic info
+safeClarity("event", "page_loaded");
+safeClarity("set", "game_version", "1.8.8");
+safeClarity("set", "site_type", "eaglercraft");
+
+// track tab focus (are they actually playing?)
+document.addEventListener("visibilitychange", () => {
+  if(document.hidden){
+    safeClarity("event", "tab_hidden");
+  } else {
+    safeClarity("event", "tab_focused");
   }
-}
+});
+
+// track leaving (session length)
+window.addEventListener("beforeunload", () => {
+  let duration = Math.floor((Date.now() - sessionStart) / 1000);
+  safeClarity("set", "session_seconds", duration);
+});
 </script>
 
 <script src="bootstrap.js"></script>
@@ -56,18 +73,32 @@ relays: [
 ]
 };
 
+// URL server tracking
 var q = window.location.search;
 if(q && q[0] === "?" && window.URLSearchParams){
 var params = new URLSearchParams(q);
 var s = params.get("server");
-if(s) window.eaglercraftXOpts.joinServer = s;
+if(s){
+  window.eaglercraftXOpts.joinServer = s;
+
+  // ✅ track server join
+  safeClarity("event", "server_joined");
+  safeClarity("set", "server_address", s);
+}
 }
 
-/* ✅ TRACK BEFORE GAME STARTS */
-trackPlayClick();
-trackGameStart();
+// detect first actual game boot
+if(!hasStartedGame){
+  hasStartedGame = true;
+  safeClarity("event", "game_started");
+}
 
-/* 🔥 Launch game */
+// delay to ensure Clarity loads before firing
+setTimeout(() => {
+  safeClarity("event", "game_boot_complete");
+}, 1500);
+
+// 🔥 launch game
 main();
 
 });
